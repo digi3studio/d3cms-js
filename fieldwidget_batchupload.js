@@ -52,6 +52,19 @@ $(document).ready(function(){
         return unique_fields;
     }
 
+    $('.advance').on('click', function (e) {
+        e.stopPropagation();
+
+        var eleGroup = $('#batchupload-dialog .advance_panel');
+        if (eleGroup.hasClass('none')) {
+            eleGroup.removeClass('none');
+        } else {
+            eleGroup.addClass('none');
+        };
+        return false;
+    });
+
+
     /*
      * Given an array of file_fields, search the object
      * that match the given target(e.g. img191_g2_5_gTOKEN_4)
@@ -131,7 +144,7 @@ $(document).ready(function(){
             return;
         }
 
-        var html = $('<li><div class="index"></div><div class="filename"></div><div class="status"></div><div class="size"><span class="uploaded">0</span>/<span class="total">0</span></div><div class="remote-filename"></div><div><input type="button" value="upload" class="upload_button"></div></li>');
+        var html = $('<li style="list-style: none; float: left; font-size: 11px; padding-top: 3px; width: 220px;"><div class="index"></div><div class="filename"></div><div class="status"></div><div class="size"><span class="uploaded">0</span>/<span class="total">0</span></div><div class="remote-filename"></div><div><input type="button" value="upload" class="upload_button"></div><hr></li>');
         $(html).attr("data-file-id", file.id);
         $(html).find(".index").html(file.index);
         $(html).find(".filename").html(file.name);
