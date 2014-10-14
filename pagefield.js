@@ -213,6 +213,18 @@ function store_fields(){
         if(str=='http://')field.val('');
     }
 
+    /*checkbox fix*/
+    $('input[type="checkbox"]').each(function(e){
+        if(this.checked==true){
+            $(this).attr('value','1');
+            this.checked=true;
+        }else{
+            $(this).attr('value','0');
+            this.checked=true;
+            this.hidden = true;
+        }
+    });
+
     //store fields value as session;
     $.ajax({
         type:'POST',
