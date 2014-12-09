@@ -19,7 +19,7 @@ function copyfield(){
 }
 
 function pastefield(){
-    data = prompt('paste data here:');
+    var data = prompt('paste data here:');
     $('form').deserialize(data);
 }
 
@@ -156,18 +156,26 @@ function setup_style_select(){
     var albums = $('.page_type_select IMG');
     for(var i=0;i<albums.length;i++){
         var pageType = $(albums[i]).attr('data-page-type');
-        $(albums[i]).css({'background':'url('+imgpath+'/page'+pageType+'.gif) no-repeat'});
+        $(albums[i]).css({'background':'url('+imgpath+'/page'+pageType+'s.gif) no-repeat'});
     }
 
+    var thumbnail_size = 50;
     //mousemove change image function
     $('.page_type_select IMG').mousemove(function(e){
+        e.preventDefault();
+        if($('div.role-admin').length == 0){
+            return false;
+        };
+
         var selectorSize = $(this).width();
         var layoutCount = parseInt($(e.target).attr('data-layout-count'));
 
         var x = (e.pageX - this.offsetLeft)/selectorSize;
-        var tx = -Math.floor(x*layoutCount)*100;
+        var tx = -Math.floor(x*layoutCount)*thumbnail_size;
 
         $(e.target).css({'background-position':tx+'px 0px'});
+        //basic user only can select simple content layout1, gallery layout3
+
     });
 
     //fix the mouse over
@@ -193,6 +201,17 @@ function setup_style_select(){
         var selected_page_type		= $(e.target).attr('data-page-type');
         var selected_page_layout	= Math.floor((e.pageX - this.offsetLeft)/selectorSize* layoutCount);
 
+        if($('div.role-admin').length == 0){
+            switch(selected_page_type){
+                case('1'):
+                    selected_page_layout = 0;
+                    break;
+                case('4'):
+                    selected_page_layout = 2;
+                    break;
+            }
+        };
+
         $('.page_selected IMG').css({'background':'url('+imgpath+'/page'+selected_page_type+'.gif) no-repeat '+(-selected_page_layout*100)+'px 0px'});
 
         $('#pagetype_id').attr('value',selected_page_type);
@@ -201,19 +220,44 @@ function setup_style_select(){
         //store fields value as session;
         store_fields();
     });
+
+    $('.page_type_select img[data-page-type=4]').css({'background-position':'-100px 0'});
 }
 
 function store_fields(){
     $('#ajax_wait').removeClass('hide');
-
-    var url_fields = $('FORM#page input.textfield[data-type="link_url"]');
-    for(var i=0;i<url_fields.length;i++){
-        var field = $(url_fields[i]);
+    //store fields value as session;
+    //add &nbsp; to special wording
+    var fields = $("FORM#page textarea.textfield");
+    for(var i=0;i<fields.length;i++){
+        var field = $(fields[i]);
+        var fieldName = field.attr('name');
+        if(fieldName=='field101'||fieldName=='field111'||fieldName=='field121'){
+            continue;
+        }
         var str = field.val();
-        if(str=='http://')field.val('');
+        field.val(str.replace(/veuve clicquot/gi,"Veuve&nbsp;Clicquot"));
     }
 
-    //store fields value as session;
+    var shortStrings = $("form#page input.textfield");
+    for(var i=0;i<shortStrings.length;i++){
+        var field = $(shortStrings[i]);
+        var str = field.val();
+        field.val(str.replace(/"/gi,"&quot;"));
+    }
+
+    /*checkbox fix*/
+    $('input[type="checkbox"]').each(function(e){
+        if(this.checked==true){
+            $(this).attr('value','1');
+            this.checked=true;
+        }else{
+            $(this).attr('value','0');
+            this.checked=true;
+            this.hidden = true;
+        }
+    });
+
     $.ajax({
         type:'POST',
         url:  adminPath+'/admin/page/storefields/save.json?session_id='+$('#form #session_id').val(),

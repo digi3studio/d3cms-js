@@ -4,9 +4,6 @@ $(document).ready(function(){
 		update : save_group_item_order
 	});
 
-    $('.btn-order-up').mousedown(item_up);
-    $('.btn-order-down').mousedown(item_down);
-
     $('.btn-group-select').on('click',toggleSelectGroup);
     $('.btn-group-move').on('click',moveSelectedGroup);
 });
@@ -42,29 +39,6 @@ function moveSelectedGroup(e){
         $('#row'+group_id+'g'+newPosition).before(rows);
         reorder(group_id);
     }
-    return false;
-}
-
-
-function item_up(e){
-    e.stopPropagation();
-    var item_id = $(e.target).attr('data-item');
-    var group_id = $(e.target).attr('data-group');
-    var row = $('#row'+item_id);
-    row.prev().before(row);
-    reorder(group_id);
-    window.location = $(e.target).attr('href');
-    return false;
-}
-
-function item_down(e){
-    e.stopPropagation();
-    var item_id = $(e.target).attr('data-item');
-    var group_id = $(e.target).attr('data-group');
-    var row = $('#row'+item_id);
-    row.next().after(row);
-    reorder(group_id);
-    window.location = $(e.target).attr('href');
     return false;
 }
 
