@@ -6,6 +6,7 @@ $(document).ready(function(){
 
     $('.btn-group-select').on('click',toggleSelectGroup);
     $('.btn-group-move').on('click',moveSelectedGroup);
+    $('.btn-group-remove').on('click',removeSelectedGroup);
 });
 
 function toggleSelectGroup(e){
@@ -39,6 +40,32 @@ function moveSelectedGroup(e){
         $('#row'+group_id+'g'+newPosition).before(rows);
         reorder(group_id);
     }
+    return false;
+}
+
+function removeSelectedGroup(e){
+    e.stopPropagation();
+    var group_id = $(e.target).attr('data-group');
+    //find all rows
+    var rows = $('table[data-fieldgroup="'+group_id+'"] .group-item.active');
+    var itemCountInput = $('#count'+group_id);
+    var itemCount = parseInt(itemCountInput.val());
+
+    var r = window.confirm('are you sure to delete '+rows.length+' items?');
+    if(r == false)return false;
+
+    //move selected items to last row.
+    $('#row'+group_id+'g'+(itemCount-1))
+        .after(rows);
+
+    reorder(group_id);
+
+    itemCountInput.val(
+        itemCount-rows.length
+    );
+
+    rows.find('input, textarea').val('');
+    store_fields();
     return false;
 }
 
