@@ -10,7 +10,7 @@ $().ready(function(){
 });
 
 function on_image_file_select(e){
-	var uploadPath = basePath+'/admin/image/upload';
+	var uploadPath = basePath+'/admin/image/upload.json';
 	var field_id = $(e.target).attr('id');
 
 	$('#ajax_wait').removeClass('hide');
