@@ -1,9 +1,9 @@
 /**
  * Created by Digi3 on 23/3/2015.
  */
-/*
+
 var onWindowResizePreviewFrame = function(){
-    $('#inline-preview iframe').height($(window).height()-128);
+    $('#inline-preview iframe').height(500);
 }
 
 $(document).ready(function(){
@@ -18,6 +18,9 @@ $(document).ready(function(){
         }else{
             $('body').addClass('mode-preview');
         }
-    })
+    });
+
+    //load preview content
+    var previewFrame = $('#inline-preview iframe');
+    previewFrame.attr('src',previewFrame.data('preview-url'));
 });
-*/

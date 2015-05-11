@@ -1,4 +1,7 @@
+var controller;
 $(document).ready(function(){
+    controller = $('body').data('controller');
+
     setup_style_select();
     setup_form_action();
     setup_add_field_group();
@@ -9,6 +12,7 @@ $(document).ready(function(){
     setup_toggle_group();
 
     $(document).on('keydown', setup_hotkeys);
+
 
     $('a[data-action]').on('click',function(e){e.stopPropagation();eval($(this).data('action')+'()');return false;});
 });
@@ -113,7 +117,7 @@ function setup_before_action(){
 
         $.ajax({
             type:'POST',
-            url:  adminPath+'/admin/page/storefields/save.json?session_id='+$('#form #session_id').val(),
+            url:  adminPath+'/'+controller+'/storefields/save.json?session_id='+$('#form #session_id').val(),
             data: $('FORM#page').serialize(),
             success: function(){
                 window.location = destination;
@@ -260,7 +264,7 @@ function store_fields(){
 
     $.ajax({
         type:'POST',
-        url:  adminPath+'/admin/page/storefields/save.json?session_id='+$('#form #session_id').val(),
+        url:  adminPath+'/'+controller+'/storefields/save.json?session_id='+$('#form #session_id').val(),
         data: $('FORM#page').serialize(),
         success: store_fields_success
     });
@@ -280,11 +284,11 @@ function store_fields_success(){
     var parameter = pageId+'?campaign='+campaign+'&session_id='+sessionId+'&language='+language;
 
     if(isPreview==true){
-        window.location = adminPath+'/admin/page/preview/'+parameter;
+        window.location = adminPath+'/'+controller+'/preview/'+parameter;
         return;
     }
 
-    window.location = adminPath+'/admin/page/edit/'+parameter;
+    window.location = adminPath+'/'+controller+'/edit/'+parameter;
 }
 
 function setup_add_field_group(){
