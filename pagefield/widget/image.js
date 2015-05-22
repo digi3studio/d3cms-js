@@ -1,25 +1,25 @@
 // JavaScript Document
- 
 var basePath;
 $().ready(function(){
-	basePath = String(window.location).split('/admin/')[0];
-	$('.imagefield').change(on_image_file_select);
+	basePath = $('body').data('base');
+
+	$('.imagefield[type="file"]').on('change',on_image_file_select);
     $('.btn_crop').mousedown(on_crop_tool_toggle);
     $('.crop-tool-viewer .target-image').mousedown(crop_pic);
     $('.crop-tool-viewer .target-image').mouseout(out_crop_pic);
 });
 
 function on_image_file_select(e){
-	var uploadPath = basePath+'/admin/image/upload';
-	var field_id = $(e.target).attr('id');
+	var uploadPath = basePath+'admin/image/upload.json';
+    var file = $(e.target);
 
 	$('#ajax_wait').removeClass('hide');
 	//post the image to server
 	$.ajaxFileUpload({
 		url:uploadPath,
 		secureuri:false,
-		fileElementId:field_id,
-		data:{'pagefieldvalue_key':field_id},
+		fileElementId:file.attr('id'),
+		data:{'pagefieldvalue_key':file.attr('name')},
 		dataType:'json',
 		success:on_image_file_select_success,
 		error:on_image_file_select_error
@@ -29,9 +29,7 @@ function on_image_file_select(e){
 
 function on_image_file_select_success(data,status){
 	var field_id = (data.post['pagefieldvalue_key'].split('img')[1]);
-
-	$('#field'+field_id).val(data.response);
-
+	$('input[name="field'+field_id+'"]').val(data.response).trigger('change');
 	$('#ajax_wait').addClass('hide');
 }
 
@@ -42,26 +40,28 @@ function on_image_file_select_error(data,status){
 //crop tool
 function on_crop_tool_toggle(e){
     e.stopPropagation();
-    var field_jsid = $(e.target).attr('data-field');
-    var cropTool = $(".crop-tool-viewer[data-field='"+field_jsid+"']");
-    var image_url = $('#field'+field_jsid).val();
+    var imageField = $(e.target).parent();
+    var id = imageField.data('id');
+    var image_url = $('input[name="'+id+'"]').val();
+
     if(image_url==''){
         alert('no image to crop');
         return false;
     }
 
+    var cropTool = imageField.find('.crop-tool-viewer');
+
     //toggle crop tool show/hide
     if(cropTool.hasClass('none')==false){
         cropTool.addClass('none');
         return false;
-    }else{
-        $('.crop-tool-viewer').addClass('none');
-        cropTool.removeClass('none');
     }
+    $('.crop-tool-viewer').addClass('none');
+    cropTool.removeClass('none');
 
-    curr_crop_pic = field_jsid;
+    curr_crop_pic = id;
     //load image into croptool.
-    cropTool.children('.target-image').attr('src','/imagefly/w200-h200/media/upload/'+image_url);
+    cropTool.children('.target-image').attr('src', basePath+'imagefly/w200-h200/media/upload/'+image_url);
 
     return false;
 }
@@ -74,12 +74,13 @@ var crop_width = 0;
 function crop_pic(e){
     e.stopPropagation();
     if(e.ctrlKey==true){
-        var cropValues = $('#field'+curr_crop_pic+'_2').attr('value');
+        var cropInput = $('input[name="'+curr_crop_pic+'_2"]');
+        var cropValues = cropInput.val();
         if(cropValues.split("_").length!=3)return false;
 
         var cx = String((e.offsetX-crop_start_offsetX)/crop_width).substr(2,4);
         var cy = String((e.offsetY-crop_start_offsetY)/crop_width).substr(2,4);
-        $('#field'+curr_crop_pic+'_2').attr('value',cropValues+"_"+cx+"_"+cy);
+        cropInput.val(cropValues+"_"+cx+"_"+cy);
 
         update_crop_center_pos(e.offsetX,e.offsetY);
         return false;
@@ -127,7 +128,9 @@ function end_crop_pic(e){
     crop_width = e.offsetX - crop_start_offsetX;
     var box_size = crop_width/pic.width();
     crop_parameter = crop_parameter+String(box_size).substr(2,4);
-    $('#field'+curr_crop_pic+'_2').attr('value',crop_parameter);
+
+    var cropInput = $('input[name="'+curr_crop_pic+'_2"]');
+    cropInput.val(crop_parameter);
 
     //update crop area;
     pic.unbind('mousemove',editing_crop);
@@ -139,13 +142,13 @@ function end_crop_pic(e){
 }
 
 function update_crop_area_pos(x,y){
-    $(".crop-tool-viewer[data-field="+curr_crop_pic+"] .crop-area").attr('style','margin:'+y+'px 0 0 '+x+'px;');
+    $('.field-info[data-id="'+curr_crop_pic+'"] .crop-area').attr('style','margin:'+y+'px 0 0 '+x+'px;');
 }
 
 function update_crop_area_size(w){
-    $(".crop-tool-viewer[data-field="+curr_crop_pic+"] .crop-area").attr('style','margin:'+crop_start_offsetY+'px 0 0 '+crop_start_offsetX+'px;'+'width:'+w+'px; height:'+w+'px');
+    $('.field-info[data-id="'+curr_crop_pic+'"] .crop-area').attr('style','margin:'+crop_start_offsetY+'px 0 0 '+crop_start_offsetX+'px;'+'width:'+w+'px; height:'+w+'px');
 }
 
 function update_crop_center_pos(x,y){
-    $(".crop-tool-viewer[data-field="+curr_crop_pic+"] .crop-center").attr('style','margin:'+(y-2)+'px 0 0 '+(x-2)+'px;');
+    $('.field-info[data-id="'+curr_crop_pic+'"] .crop-center').attr('style','margin:'+(y-2)+'px 0 0 '+(x-2)+'px;');
 }
