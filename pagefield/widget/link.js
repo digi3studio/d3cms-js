@@ -7,6 +7,5 @@ function setup_url_fields(){
     for(var i=0;i<url_fields.length;i++){
         var field = $(url_fields[i]);
         var str = field.val();
-        if(str=='')field.val('http://');
     }
 }

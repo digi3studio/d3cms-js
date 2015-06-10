@@ -1,40 +1,44 @@
 // JavaScript Document
 var basePath;
 $().ready(function(){
-	basePath = $('body').data('base');
+    basePath = $('body').data('base');
 
-	$('.imagefield[type="file"]').on('change',on_image_file_select);
+    $('.imagefield[type="file"]').attr('onchange','on_image_file_select({target:this})');//.on('change',on_image_file_select);
     $('.btn_crop').mousedown(on_crop_tool_toggle);
     $('.crop-tool-viewer .target-image').mousedown(crop_pic);
     $('.crop-tool-viewer .target-image').mouseout(out_crop_pic);
 });
 
 function on_image_file_select(e){
-	var uploadPath = basePath+'admin/image/upload.json';
+    var uploadPath = basePath+'admin/image/upload.json';
     var file = $(e.target);
 
-	$('#ajax_wait').removeClass('hide');
-	//post the image to server
-	$.ajaxFileUpload({
-		url:uploadPath,
-		secureuri:false,
-		fileElementId:file.attr('id'),
-		data:{'pagefieldvalue_key':file.attr('name')},
-		dataType:'json',
-		success:on_image_file_select_success,
-		error:on_image_file_select_error
-	});
-	return false;
+    $('#ajax_wait').removeClass('hide');
+    //post the image to server
+    $.ajaxFileUpload({
+        url:uploadPath,
+        secureuri:false,
+        fileElementId:file.attr('id'),
+        data:{'pagefieldvalue_key':file.attr('name')},
+        dataType:'json',
+        success:on_image_file_select_success,
+        error:on_image_file_select_error
+    });
+    return false;
 }
 
 function on_image_file_select_success(data,status){
-	var field_id = (data.post['pagefieldvalue_key'].split('img')[1]);
-	$('input[name="field'+field_id+'"]').val(data.response).trigger('change');
-	$('#ajax_wait').addClass('hide');
+    var field_id = (data.post['pagefieldvalue_key'].split('img')[1]);
+    $('input[name="field'+field_id+'"]').val(data.response).trigger('change');
+    $('#ajax_wait').addClass('hide');
+    $('input[name="img'+field_id+'"]').val(null);
 }
 
 function on_image_file_select_error(data,status){
-	$('#ajax_wait').addClass('hide');
+    $('#ajax_wait').addClass('hide');
+
+    var field_id = (data.post['pagefieldvalue_key'].split('img')[1]);
+    $('input[name="img'+field_id+'"]').val(null);
 }
 
 //crop tool
