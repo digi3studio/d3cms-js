@@ -43,12 +43,18 @@ function previewOnLoadInjectEditing(){
     );
 
     frameDoc.find('a').on('click',previewLinkDisable);
+
     /*text*/
     frameDoc.find('span.inline-input')
         .attr('contentEditable','true')
         .on('click',startEditField)
         .on('keyup',previewInlineEditOnChangeSyncInput)
         .on('blur',previewInlineEditCheck)
+
+    /*link*/
+    frameDoc.find("a > .inline-input")
+        .attr('contentEditable','false') //disable inline edit and use modal instead
+        .on('mousedown',startEditLinkTimer);
 
     /*file attributes*/
     frameDoc.find('img').each(function(){
@@ -135,23 +141,96 @@ function previewInlineEditCheck(){
     }
 }
 
-function initPrompt(){
+function initPrompt() {
     $('#prompt')
         .modal({
-            onApprove : function() {
-                $('#prompt-content .input').each(function(){
-                    console.log($(this));
+            onApprove: function () {
+                //get the iframe
+                var previewFrame = $('#inline-preview-frame');
+                var frameDoc = previewFrame.contents();
+
+                $('#prompt-content .input > [data-id]').each(function () {
+                    //for each updated field in the modal, update the real form and the preview iframe
+                    var modalInput = $(this).get(0);
+                    var data_id = $(modalInput).attr("data-id");
+                    switch (modalInput.tagName) {
+                        case 'INPUT':
+                            //update the preview iframe
+                            var m = data_id.match("[_]([0-9])$");
+                            var t = frameDoc.find('span.inline-input[data-id="' + data_id + '"]');
+                            if (m.length > 1) {
+                                switch (m[1]) {
+                                    case '1'://label
+                                        t.html($(modalInput).val());
+                                        break;
+                                    case '2'://link
+                                        //we cannot update preview href at this moment, as it doesn't has 'data-id' attribute
+                                        t.parent().attr("href", $(modalInput).val());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            //now update the real form
+                            $('#form_fields input[name="' + data_id + '"]').val($(modalInput).val());
+                            break;
+                        case 'TEXTAREA':
+                            break;
+                        default:
+                            break;
+                    }
                 });
             }
         })
 }
-
 
 $(document).ready(function(){
     initToggleEditMode();
     initPreview();
     initPrompt();
 });
+
+function startEditLinkTimer(e){
+    e.stopPropagation();
+
+    var timeout_id;
+    var hold_time = 1000;//hold mousedown for 1 second
+    var element = $(this);
+    timeout_id = setTimeout(function(){
+        startEditLink(e, element);
+    }, hold_time);
+    $(this).bind('mouseup mouseleave', function() {
+        clearTimeout(timeout_id);
+    });
+}
+
+function startEditLink(e, element){
+    e.stopPropagation();
+
+    var id = element.data('id');
+    var group = id.replace(/([_][0-9])$/, '');//remove _1, _2 at the end
+    var fieldInfo = $('span[data-id="' + group + '"].field-info');
+
+    var promptName = 'Link Edit';
+    var promptInputs = [];
+    var contentId = group;
+
+    promptInputs.push(getEditorHtml(
+        fieldInfo.data('id'),
+        fieldInfo.data('type'),
+        fieldInfo.data('name'),
+        fieldInfo.data('option')
+    ));
+
+    $('#prompt-header').html(promptName);
+    $('#prompt-content')
+        .attr('data-id',contentId)
+        .html(promptInputs.join('\n'));
+
+    $('#prompt')
+        .modal('setting', 'transition', 'vertical flip')
+        .modal('show');
+}
 
 function startEditField(e){
     return;
