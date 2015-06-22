@@ -14,7 +14,7 @@ function initToggleEditMode(){
 }
 
 function inlinePreviewResize(){
-    $('#inline-preview-frame').height($(window).height()-150);
+    $('#inline-preview-frame').height($(window).height()-300);
 }
 
 function initPreview(){
