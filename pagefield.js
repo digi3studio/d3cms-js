@@ -78,7 +78,6 @@ function setup_form_action(){
 function save(){
     store_fields(
         function(){
-            $('#ajax_wait').addClass('hide');
             $('FORM#page').submit();
         }
     );
@@ -109,25 +108,30 @@ function reload(){
 }
 
 function store_fields(onSuccess){
+    if(onSuccess==null){
+        onSuccess = function(){}
+    }
     $('#ajax_wait').removeClass('hide');
     //store fields value as session;
     //add &nbsp; to special wording
-    var fields = $("FORM#page textarea.textfield");
-    for(var i=0;i<fields.length;i++){
-        var field = $(fields[i]);
+    var form = $('form#page');
+    var fields = form.find('textarea.textfield');
+    var i, field, str;
+    for(i=0;i<fields.length;i++){
+        field = $(fields[i]);
         var fieldName = field.attr('name');
         if(fieldName=='field101'||fieldName=='field111'||fieldName=='field121'){
             continue;
         }
-        var str = field.val();
+        str = field.val();
         field.val(str.replace(/veuve clicquot/gi,"Veuve&nbsp;Clicquot"));
     }
 
-    var shortStrings = $("form#page input.textfield");
-    for(var i=0;i<shortStrings.length;i++){
-        var field = $(shortStrings[i]);
-        var str = field.val();
-        field.val(str.replace(/"/gi,"&quot;"));
+    var shortStrings = form.find('input.textfield');
+    for(i=0;i<shortStrings.length;i++){
+        field = $(shortStrings[i]);
+        str = field.val();
+        field.val(str.replace(/"/gi,'&quot;'));
     }
 
     /*checkbox fix*/
@@ -145,7 +149,7 @@ function store_fields(onSuccess){
     $.ajax({
         type:'POST',
         url:  base+controller+'/storefields/save.json?session_id='+$('#form #session_id').val(),
-        data: $('FORM#page').serialize(),
+        data: form.serialize(),
         success: function(){
             $('#ajax_wait').addClass('hide');
             onSuccess();

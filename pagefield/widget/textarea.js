@@ -1,43 +1,34 @@
-jQuery(document).ready(function($) {
-	$('.pagefield_group .textarea').keyup(update_edit);
-	$('.pagefield_group .textarea').keydown(on_key_down);
-	$('.textarea_control A').click(toggle_editor);
-//	$('.pagefield_group .textarea').bind('keydown', 'ctrl+i', italic_text);
+$(document).on('ready',function() {
+    var selectors = [];
+    $('span[data-name="body"] textarea.textarea').each(function(){
+        selectors.push('textarea#'+$(this).attr('id'));
+    });
+
+    tinymce.init({
+        selector: selectors.join(", "),
+        theme: "modern",
+        height: 200,
+        width:  510,
+        menubar: "insert edit table tools",
+        plugins: [
+            "advlist autolink link image lists",
+            "code",
+            "save table directionality paste"
+        ],
+        toolbar: "insertfile undo redo | styleselect | bold underline | bullist numlist  | link image",
+        style_formats: [
+            {title: 'header 1', block: 'h1'},
+            {title: 'header 2', block: 'h2'},
+            {title: 'header 3', block: 'h3'}
+        ],
+        relative_urls: false,
+        image_advtab: true ,
+        fix_list_elements : true,
+        force_p_newlines : true,
+        keep_styles: false,
+        document_base_url: '/',
+        remove_trailing_brs: false
+    });
+
 });
 
-function on_key_down(e){
-	if(e.ctrlKey){
-		switch (e.which){
-			case(66):
-				$(document)[0].execCommand('bold',null,false);
-				break;
-			case(76):
-				$(document)[0].execCommand('italy',null,false);
-				break;
-		}
-	};
-}
-
-function update_edit(e){
-	var id = $(e.target).attr('id').split('txt')[1];
-	var textarea 	= $('TEXTAREA[name="field'+id+'"]');
-	textarea.html($(e.target).html());
-}
-
-function toggle_editor(e){
-	var id = $(e.target).attr('id').split('ctl')[1];
-	var textarea 	= $('TEXTAREA[name="field'+id+'"]');
-	var inlineEditor= $('DIV[name="txt'+id+'"]');
-
-	if(textarea.hasClass('none')){
-		textarea.removeClass('none');
-		inlineEditor.addClass('none');
-	}else{
-		textarea.addClass('none');
-		inlineEditor.removeClass('none');
-
-		inlineEditor.html(textarea.val().replace(/[\r\n]\n?/gi,'<br\/><br\/>'));
-		textarea.html(inlineEditor.html());
-	}
-	return false;
-}

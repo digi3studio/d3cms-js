@@ -29,7 +29,13 @@ function on_image_file_select(e){
 
 function on_image_file_select_success(data,status){
     var field_id = (data.post['pagefieldvalue_key'].split('img')[1]);
-    $('input[name="field'+field_id+'"]').val(data.response).trigger('change');
+    var field = $('input[name="field'+field_id+'"]');
+    //the input field maybe textarea.
+    if(field.length==0){
+        field = $('textarea[name="field'+field_id+'"]');
+    };
+
+    field.val(data.response).trigger('change');
     $('#ajax_wait').addClass('hide');
     $('input[name="img'+field_id+'"]').val(null);
 }
