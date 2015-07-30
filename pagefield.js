@@ -118,7 +118,7 @@ function store_fields(onSuccess){
     for(var i=0;i<fields.length;i++){
         var field = $(fields[i]);
         var str = field.html();
-        field.html(str.replace(/?/gi,''));
+        field.html(str.replace(/﻿/gi,''));
     }
 
     //add &nbsp; to special wording
@@ -141,6 +141,7 @@ function store_fields(onSuccess){
         field = $(shortStrings[i]);
         str = field.val();
         field.val(str.replace(/"/gi,'&quot;'));
+        field.val(str.replace(/﻿/gi,''));
     }
 
     /*checkbox fix*/
