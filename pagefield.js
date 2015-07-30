@@ -113,6 +113,14 @@ function store_fields(onSuccess){
     }
     $('#ajax_wait').removeClass('hide');
     //store fields value as session;
+    //clean up korean fix break
+    var fields = $("FORM#page textarea.textfield");
+    for(var i=0;i<fields.length;i++){
+        var field = $(fields[i]);
+        var str = field.html();
+        field.html(str.replace(/?/gi,''));
+    }
+
     //add &nbsp; to special wording
     var form = $('form#page');
     var fields = form.find('textarea.textfield');
@@ -120,6 +128,7 @@ function store_fields(onSuccess){
     for(i=0;i<fields.length;i++){
         field = $(fields[i]);
         var fieldName = field.attr('name');
+
         if(fieldName=='field101'||fieldName=='field111'||fieldName=='field121'){
             continue;
         }
