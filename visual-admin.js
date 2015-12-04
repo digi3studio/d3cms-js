@@ -2,6 +2,7 @@
  * Created by Digi3 on 23/3/2015.
  */
 $(document).ready(function(){
+    //init page without pagetype id
     var fieldPagetype = $('#pagetype_id');
     if(!fieldPagetype.val()){
         fieldPagetype.val('1');
@@ -12,7 +13,7 @@ $(document).ready(function(){
 
     $('#action-advance').on('click',function(){
         localStorage.d3cms_livepreview = (localStorage.d3cms_livepreview=='true')?'false':'true';
-        renderLivePreview();
+        store_fields(render);
     });
 
     $(window).on('resize', renderPreviewResize);
@@ -61,7 +62,10 @@ $(document).ready(function(){
     });
 
     //store current fields and load liveview frame
-    store_fields(render);
+
+    if(localStorage.d3cms_livepreview == 'true'){
+        store_fields(render);
+    }
 });
 
 function render(){

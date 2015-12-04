@@ -18,6 +18,10 @@ $(document).ready(function(){
         eval($(this).data('action')+'()');
         return false;
     });
+
+    $('input[type="checkbox"]').on('change', function(e){
+        $(this).attr('value', $(this).is(':checked')?1:0);
+    });
 });
 
 function copyfield(){
@@ -146,14 +150,7 @@ function store_fields(onSuccess){
 
     /*checkbox fix*/
     $('input[type="checkbox"]').each(function(e){
-        if(this.checked==true){
-            $(this).attr('value','1');
-            this.checked=true;
-        }else{
-            $(this).attr('value','0');
-            this.checked=true;
-            this.hidden = true;
-        }
+        $(this).attr('type', 'hidden');
     });
 
     $.ajax({
@@ -162,6 +159,10 @@ function store_fields(onSuccess){
         data: form.serialize(),
         success: function(){
             $('#ajax_wait').addClass('hide');
+            //restore checkbox
+            $('input.checkbox').each(function(e){
+                $(this).attr('type', 'checkbox');
+            });
             onSuccess();
         }
     });
