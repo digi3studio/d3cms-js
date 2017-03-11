@@ -10,7 +10,7 @@ $().ready(function(){
 });
 
 function on_image_file_select(e){
-    var uploadPath = basePath+'admin/image/upload.json';
+    var uploadPath = basePath+'admin/image/upload.txt';
     var file = $(e.target);
 
     $('#ajax_wait').removeClass('hide');
