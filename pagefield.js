@@ -235,8 +235,6 @@ function store_fields(){
         if(fieldName=='field101'||fieldName=='field111'||fieldName=='field121'){
             continue;
         }
-        var str = field.val();
-        field.val(str.replace(/veuve clicquot/gi,"Veuve&nbsp;Clicquot"));
     }
 
     var shortStrings = $("form#page input.textfield");
